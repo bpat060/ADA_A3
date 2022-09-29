@@ -11,11 +11,11 @@ package A3;
  */
 //reference
 //coded and developed from psuedo code and writing in https://algorithmtutor.com/Data-Structures/Tree/Red-Black-Trees/
-public class BalancedPersistentDynamicSet<E extends Comparable<E>> extends BinarySearchTreeGivenTemplate {
+public class BalancedPersistentDynamicSet<E extends Comparable<E>> extends BinarySearchTree {
 
     public static final boolean RED = true;
     public static final boolean BLACK = false;
-    public BinarySearchTreeGivenTemplate.BinaryTreeNode root;
+    public BinarySearchTree.BinaryTreeNode root;
 
     //empty constructor for now
     public BalancedPersistentDynamicSet() {

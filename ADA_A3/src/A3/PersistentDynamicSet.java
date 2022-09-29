@@ -9,12 +9,12 @@ package A3;
  *
  * @author Owner
  */
-public class PersistentDynamicSet extends BinarySearchTreeGivenTemplate {
+public class PersistentDynamicSet extends BinarySearchTree {
 
-    BinarySearchTreeGivenTemplate tree;
+    BinarySearchTree tree;
 
     //class constructor, taking in a normal BST
-    PersistentDynamicSet(BinarySearchTreeGivenTemplate tree) {
+    PersistentDynamicSet(BinarySearchTree tree) {
         tree = this.tree;
     }
 
