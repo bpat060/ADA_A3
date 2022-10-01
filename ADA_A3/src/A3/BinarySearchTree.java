@@ -375,13 +375,13 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         SortedSet<String> tree = new BinarySearchTree<String>();
         // build the tree
         tree.add("cow");
-        tree.add("fly");
-        tree.add("dog");
         tree.add("bat");
         tree.add("fox");
         tree.add("cat");
         tree.add("eel");
         tree.add("ant");
+        tree.add("owl");
+        tree.add("fly");
         System.out.println("Original Tree: " + tree);
         tree.remove("owl");
         tree.remove("cow");
