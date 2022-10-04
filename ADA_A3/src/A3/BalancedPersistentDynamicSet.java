@@ -15,7 +15,7 @@ public class BalancedPersistentDynamicSet<E extends Comparable<E>> extends Binar
 
     public static final boolean RED = true;
     public static final boolean BLACK = false;
-    public BinaryTreeNode root, x, y;
+    public BinaryTreeNode checkNode, x, y, r, w;
 
     //empty constructor for now
     public BalancedPersistentDynamicSet() {
@@ -90,11 +90,115 @@ public class BalancedPersistentDynamicSet<E extends Comparable<E>> extends Binar
     }
 
     private void delete(BinarySearchTree tree, BinaryTreeNode z) {
-
+        checkNode = null;
+        if (z.leftChild != null && z.rightChild != null) {
+            r = z.rightChild;
+            do {
+                r = r.leftChild;
+            } while (r.leftChild == null);
+            r.parent.leftChild = r.rightChild;
+            if (r.rightChild != null) {
+                r.rightChild.parent = r.parent;
+            }
+            if (r.color == BLACK) {
+                checkNode = r.rightChild;
+            }
+            r.leftChild = z.leftChild;
+            z.leftChild.parent = r;
+            r.rightChild = z.rightChild;
+            z.rightChild.parent = r;
+            r.color = z.color;
+        } else if (z.leftChild != null || z.rightChild == null) {
+            if (z.leftChild != null) {
+                r = z.leftChild;
+            } else {
+                r = z.rightChild;
+            }
+            if (z.color == BLACK) {
+                checkNode = r;
+            }
+        } else {
+            r = null;
+            if (z.color == BLACK) {
+                checkNode = z.parent;
+            }
+        }
+        if (r != null) {
+            r.parent = z.parent;
+        }
+        if (z.parent == null) {
+            tree.root = r;
+        } else if (z == z.parent.leftChild) {
+            z.parent.leftChild = r;
+        } else {
+            z.parent.rightChild = r;
+        }
+        if (checkNode != null) {
+            deleteFixUp(tree, checkNode);
+        }
     }
 
-    private void deleteFixUp(BinarySearchTree tree, BinaryTreeNode z) {
+    private void deleteFixUp(BinarySearchTree tree, BinaryTreeNode x) {
+        do {
+            if (x == x.parent.leftChild) {
+                w = x.parent.rightChild;
+                if (w != null && w.color == RED) {
+                    w.color = BLACK;
+                    x.parent.color = RED;
+                    rotateLeft(tree, x.parent);
+                    w = x.parent.rightChild;
+                }
+                if ((w == null || (w.leftChild == null || w.leftChild.color == BLACK)) && (w.rightChild == null || w.rightChild.color == BLACK)) {
+                    if (w != null) {
+                        w.color = RED;
+                    }
+                    x = x.parent;
+                } else {
+                    if (w.rightChild == null || w.rightChild.color == BLACK) {
+                        w.leftChild.color = BLACK;
+                        w.color = RED;
+                        rotateRight(tree, w);
+                        w = x.parent.rightChild;
+                    }
+                    w.color = x.parent.color;
+                    x.parent.color = BLACK;
+                    w.rightChild.color = BLACK;
+                    rotateLeft(tree, x.parent);
+                    x = tree.root;
+                }
+            } else {
+                //copied above but need to interchange
+                //left and right
+                w = x.parent.rightChild;
+                if (w != null && w.color == RED) {
+                    w.color = BLACK;
+                    x.parent.color = RED;
+                    rotateLeft(tree, x.parent);
+                    w = x.parent.rightChild;
+                }
+                if ((w == null || (w.leftChild == null || w.leftChild.color == BLACK)) && (w.rightChild == null || w.rightChild.color == BLACK)) {
+                    if (w != null) {
+                        w.color = RED;
+                    }
+                    x = x.parent;
+                } else {
+                    if (w.rightChild == null || w.rightChild.color == BLACK) {
+                        w.leftChild.color = BLACK;
+                        w.color = RED;
+                        rotateRight(tree, w);
+                        w = x.parent.rightChild;
+                    }
+                    w.color = x.parent.color;
+                    x.parent.color = BLACK;
+                    w.rightChild.color = BLACK;
+                    rotateLeft(tree, x.parent);
+                    x = tree.root;
+                }
 
+            }
+
+        } while (x != tree.root && x.color == BLACK);
+        x.color = BLACK;
     }
 
     private void rotateLeft(BinarySearchTree tree, BinaryTreeNode x) {
