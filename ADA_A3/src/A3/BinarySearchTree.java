@@ -29,6 +29,7 @@ public class BinarySearchTree<E> extends AbstractSet<E>
     protected BinaryTreeNode rootNode;
     private Comparator<? super E> comparator;//null for natural ordering
     private E fromElement, toElement; // bounds for visible view of tree
+    BinaryTreeNode root;
 
     public BinarySearchTree() {
         super();
@@ -406,13 +407,16 @@ public class BinarySearchTree<E> extends AbstractSet<E>
     // left child and right child (no need for link to parent)
     protected class BinaryTreeNode {
 
-        public BinaryTreeNode leftChild, rightChild;
+        public BinaryTreeNode leftChild, rightChild, parent;
         public E element;
+        int key;
+        boolean color;
 
         public BinaryTreeNode(E element) {
             this.element = element;
             leftChild = null;
             rightChild = null;
+            parent = null;
         }
 
         // returns a string representation of the node and
