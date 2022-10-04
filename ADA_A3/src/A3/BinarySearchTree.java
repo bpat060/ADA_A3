@@ -20,16 +20,17 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
+import java.util.Scanner;
 import java.util.SortedSet;
 
 public class BinarySearchTree<E> extends AbstractSet<E>
         implements SortedSet<E> {
 
     private int numElements;
-    protected BinaryTreeNode rootNode;
+    protected RedBlackTree rootNode;
     private Comparator<? super E> comparator;//null for natural ordering
     private E fromElement, toElement; // bounds for visible view of tree
-    BinaryTreeNode root;
+    RedBlackTree root;
 
     public BinarySearchTree() {
         super();
@@ -61,7 +62,7 @@ public class BinarySearchTree<E> extends AbstractSet<E>
     }
 
     // private constructor used to create a view of a portion of tree
-    private BinarySearchTree(BinaryTreeNode rootNode,
+    private BinarySearchTree(RedBlackTree rootNode,
             Comparator<? super E> comparator, E fromElement, E toElement) {
         this(comparator);
         this.rootNode = rootNode;
@@ -72,7 +73,7 @@ public class BinarySearchTree<E> extends AbstractSet<E>
     }
 
     // recursive helper method that counts number of descendants of node
-    private int countNodes(BinaryTreeNode node) {
+    public int countNodes(RedBlackTree node) {
         if (node == null) {
             return 0;
         } else {
@@ -101,13 +102,13 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         if (!withinView(o)) {
             throw new IllegalArgumentException("Outside view");
         }
-        BinaryTreeNode newNode = new BinaryTreeNode(o);
+        RedBlackTree newNode = new RedBlackTree(o);
         boolean added = false;
         if (rootNode == null) {
             rootNode = newNode;
             added = true;
         } else {  // find where to add newNode
-            BinaryTreeNode currentNode = rootNode;
+            RedBlackTree currentNode = rootNode;
             boolean done = false;
             while (!done) {
                 int comparison = compare(o, currentNode.element);
@@ -168,12 +169,12 @@ public class BinarySearchTree<E> extends AbstractSet<E>
                 rootNode = makeReplacement(rootNode);
                 removed = true;
             } else {  // search for the element o
-                BinaryTreeNode parentNode = rootNode;
-                BinaryTreeNode removalNode;
+                RedBlackTree parentNode = rootNode;
+                RedBlackTree removalNode;
                 // determine whether to traverse to left or right of root
                 if (compare(element, rootNode.element) < 0) {
                     removalNode = rootNode.leftChild;
-                } else // compare(element, rootNode.element)>0
+                } else // compare(element, root.element)>0
                 {
                     removalNode = rootNode.rightChild;
                 }
@@ -210,8 +211,8 @@ public class BinarySearchTree<E> extends AbstractSet<E>
 
     // helper method which removes removalNode (presumed not null) and
     // returns a reference to node that should take place of removalNode
-    private BinaryTreeNode makeReplacement(BinaryTreeNode removalNode) {
-        BinaryTreeNode replacementNode = null;
+    private RedBlackTree makeReplacement(RedBlackTree removalNode) {
+        RedBlackTree replacementNode = null;
         // check cases when removalNode has only one child
         if (removalNode.leftChild != null && removalNode.rightChild == null) {
             replacementNode = removalNode.leftChild;
@@ -221,7 +222,7 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         } // check case when removalNode has two children
         else if (removalNode.leftChild != null
                 && removalNode.rightChild != null) {  // find the inorder successor and use it as replacementNode
-            BinaryTreeNode parentNode = removalNode;
+            RedBlackTree parentNode = removalNode;
             replacementNode = removalNode.rightChild;
             if (replacementNode.leftChild == null) // replacementNode can be pushed up one level to replace
             // removalNode, move the left child of removalNode to be
@@ -246,6 +247,10 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         return replacementNode;
     }
 
+//    public void printPath(BinarySearchTreeGivenTemplate tree) {
+//        ArrayList<BinaryTreeNode> path = new ArrayList<>();
+//        PersistentDynamicSet.printPathRecursive(tree.getRoot(), path);
+//    }
     public Iterator<E> iterator() {
         return new BinaryTreeIterator(rootNode);
     }
@@ -268,7 +273,7 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         if (!withinView(element)) {
             return false;
         }
-        BinaryTreeNode currentNode = rootNode;
+        RedBlackTree currentNode = rootNode;
         while (!found && currentNode != null) {
             int comparison = compare(currentNode.element, element);
             if (comparison == 0) {
@@ -295,10 +300,10 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         if (rootNode == null) {
             throw new NoSuchElementException("empty tree");
         }
-        // find the least descendant of rootNode that is at least
+        // find the least descendant of root that is at least
         // as big as fromElement by traversing down tree from root
-        BinaryTreeNode currentNode = rootNode;
-        BinaryTreeNode leastYetNode = null; // smallest found so far
+        RedBlackTree currentNode = rootNode;
+        RedBlackTree leastYetNode = null; // smallest found so far
         while (currentNode != null) {
             if (compare(currentNode.element, fromElement) >= 0) {
                 if (compare(currentNode.element, toElement) < 0) {
@@ -331,10 +336,10 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         if (rootNode == null) {
             throw new NoSuchElementException("empty tree");
         }
-        // find the greatest descendant of rootNode that is less than
+        // find the greatest descendant of root that is less than
         // toElement by traversing down tree from root
-        BinaryTreeNode currentNode = rootNode;
-        BinaryTreeNode greatestYetNode = null; // greatest found so far
+        RedBlackTree currentNode = rootNode;
+        RedBlackTree greatestYetNode = null; // greatest found so far
         while (currentNode != null) {
             if (compare(currentNode.element, toElement) < 0) {
                 if (compare(currentNode.element, fromElement) >= 0) {
@@ -374,16 +379,27 @@ public class BinarySearchTree<E> extends AbstractSet<E>
 
     public static void main(String[] args) {  // create the binary search tree
         SortedSet<String> tree = new BinarySearchTree<String>();
-        // build the tree
-        tree.add("cow");
-        tree.add("bat");
-        tree.add("fox");
-        tree.add("cat");
-        tree.add("eel");
-        tree.add("ant");
-        tree.add("owl");
-        tree.add("fly");
-        System.out.println("Original Tree: " + tree);
+        PersistentDynamicSet set = new PersistentDynamicSet((BinarySearchTree) tree);
+
+        // create an object of Scanner
+        Scanner input = new Scanner(System.in);
+        System.out.println("Please enter 8 words into the binary tree: ");
+        //for loop for inputing a string into the tree
+        for (int x = 1; x < 9; x++) {
+            System.out.println(x + ": ");
+            // take input from the user
+            String shape = input.next();
+            //add input to tree/s
+            tree.add(shape);
+            set.add(shape);
+        }
+
+        //further testing of the tree for trial and error
+        System.out.println("\nOriginal Tree: " + tree);
+
+        System.out.println("Path Tree: ");
+        set.printPath();
+
         tree.remove("owl");
         tree.remove("cow");
         tree.add("owl");
@@ -400,23 +416,70 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         System.out.println();
         System.out.println("first element in subtree: " + subtree.first());
         System.out.println("last element in subtree: " + subtree.last());
+
+    }
+
+    //persistent set uses get root to get the root node.
+    RedBlackTree getRoot() {
+        return rootNode;
     }
 
     // inner class that represents a node in the binary tree
     // where each node consists of the element and links to
     // left child and right child (no need for link to parent)
-    protected class BinaryTreeNode {
+    protected class RedBlackTree {
 
-        public BinaryTreeNode leftChild, rightChild, parent;
-        public E element;
+        public RedBlackTree leftChild, rightChild, parent;// links to left and right subtrees
+        public E element;    //value
+        public boolean color;     // color of parent link
+        public int size;          // subtree count
         int key;
-        boolean color;
 
-        public BinaryTreeNode(E element) {
+        public RedBlackTree(E element, boolean color, int size) {
+            this.element = element;
+            this.color = color;
+            this.size = size;
+        }
+
+        public RedBlackTree(E element) {
             this.element = element;
             leftChild = null;
             rightChild = null;
-            parent = null;
+        }
+
+        //getting subtree count
+        public int getSize() {
+            return this.size;
+        }
+
+        //getting element
+        public E getValue() {
+            return this.element;
+        }
+
+        //getting right child
+        public RedBlackTree getRight() {
+            return this.rightChild;
+        }
+
+        //getting left child
+        public RedBlackTree getLeft() {
+            return this.leftChild;
+        }
+
+        //setting value
+        public void setValue(E value) {
+            this.element = value;
+        }
+
+        //setting right child
+        public void setRight(RedBlackTree node) {
+            this.rightChild = node;
+        }
+
+        //setting left child
+        public void setLeft(RedBlackTree node) {
+            this.leftChild = node;
         }
 
         // returns a string representation of the node and
@@ -441,7 +504,7 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         private LinkedList<E> list;
         private Iterator<E> iterator;
 
-        public BinaryTreeIterator(BinaryTreeNode rootNode) {  // puts the elements in a linked list using inorder traversal
+        public BinaryTreeIterator(RedBlackTree rootNode) {  // puts the elements in a linked list using inorder traversal
             list = new LinkedList<E>();
             traverseInOrder(rootNode);
             iterator = list.iterator();
@@ -449,7 +512,7 @@ public class BinarySearchTree<E> extends AbstractSet<E>
 
         // recursive helper method that traverses the subtree from node
         // adding the elements to the list collection
-        private void traverseInOrder(BinaryTreeNode node) {
+        private void traverseInOrder(RedBlackTree node) {
             if (node != null) {
                 traverseInOrder(node.leftChild);
                 if (withinView(node.element)) {

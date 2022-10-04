@@ -3,24 +3,29 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package old_A3;
+package A3;
 
 /**
  *
  * @author Owner
  */
-import com.sun.jdi.Value;
-import java.awt.RenderingHints.Key;
+/**
+ * A class that implements a sorted set collection using a binary search tree.
+ * Note this implementation of a binary tree does not have duplicate (equal)
+ * elements. This class allows a restricted view of the tree, between
+ * fromElement (inclusive) and toElement (exclusive)
+ *
+ * @author Andrew Ensor
+ */
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import java.util.Scanner;
 import java.util.SortedSet;
 
-public class BinarySearchTreeGivenTemplate<E> extends AbstractSet<E>
+public class BinarySearchTreeTemplate<E> extends AbstractSet<E>
         implements SortedSet<E> {
 
     private int numElements;
@@ -28,7 +33,7 @@ public class BinarySearchTreeGivenTemplate<E> extends AbstractSet<E>
     private Comparator<? super E> comparator;//null for natural ordering
     private E fromElement, toElement; // bounds for visible view of tree
 
-    public BinarySearchTreeGivenTemplate() {
+    public BinarySearchTreeTemplate() {
         super();
         numElements = 0;
         rootNode = null;
@@ -37,19 +42,19 @@ public class BinarySearchTreeGivenTemplate<E> extends AbstractSet<E>
         toElement = null;
     }
 
-    public BinarySearchTreeGivenTemplate(Collection<? extends E> c) {
+    public BinarySearchTreeTemplate(Collection<? extends E> c) {
         this();
         for (E element : c) {
             add(element);
         }
     }
 
-    public BinarySearchTreeGivenTemplate(Comparator<? super E> comparator) {
+    public BinarySearchTreeTemplate(Comparator<? super E> comparator) {
         this();
         this.comparator = comparator;
     }
 
-    public BinarySearchTreeGivenTemplate(SortedSet<E> s) {
+    public BinarySearchTreeTemplate(SortedSet<E> s) {
         this();
         this.comparator = s.comparator();
         for (E element : s) {
@@ -58,7 +63,7 @@ public class BinarySearchTreeGivenTemplate<E> extends AbstractSet<E>
     }
 
     // private constructor used to create a view of a portion of tree
-    private BinarySearchTreeGivenTemplate(BinaryTreeNode rootNode,
+    private BinarySearchTreeTemplate(BinaryTreeNode rootNode,
             Comparator<? super E> comparator, E fromElement, E toElement) {
         this(comparator);
         this.rootNode = rootNode;
@@ -69,7 +74,7 @@ public class BinarySearchTreeGivenTemplate<E> extends AbstractSet<E>
     }
 
     // recursive helper method that counts number of descendants of node
-    public int countNodes(BinaryTreeNode node) {
+    private int countNodes(BinaryTreeNode node) {
         if (node == null) {
             return 0;
         } else {
@@ -243,10 +248,6 @@ public class BinarySearchTreeGivenTemplate<E> extends AbstractSet<E>
         return replacementNode;
     }
 
-//    public void printPath(BinarySearchTreeGivenTemplate tree) {
-//        ArrayList<BinaryTreeNode> path = new ArrayList<>();
-//        PersistentDynamicSet.printPathRecursive(tree.getRoot(), path);
-//    }
     public Iterator<E> iterator() {
         return new BinaryTreeIterator(rootNode);
     }
@@ -359,7 +360,7 @@ public class BinarySearchTreeGivenTemplate<E> extends AbstractSet<E>
     }
 
     public SortedSet<E> subSet(E fromElement, E toElement) {
-        return new BinarySearchTreeGivenTemplate<E>(rootNode, comparator, fromElement,
+        return new BinarySearchTreeTemplate<E>(rootNode, comparator, fromElement,
                 toElement);
     }
 
@@ -374,28 +375,17 @@ public class BinarySearchTreeGivenTemplate<E> extends AbstractSet<E>
     }
 
     public static void main(String[] args) {  // create the binary search tree
-        SortedSet<String> tree = new BinarySearchTreeGivenTemplate<String>();
-        PersistentDynamicSet set = new PersistentDynamicSet((BinarySearchTreeGivenTemplate) tree);
-
-        // create an object of Scanner
-        Scanner input = new Scanner(System.in);
-        System.out.println("Please enter 8 words into the binary tree: ");
-        //for loop for inputing a string into the tree
-        for (int x = 1; x < 9; x++) {
-            System.out.println(x + ": ");
-            // take input from the user
-            String shape = input.next();
-            //add input to tree/s
-            tree.add(shape);
-            set.add(shape);
-        }
-
-        //further testing of the tree for trial and error
-        System.out.println("\nOriginal Tree: " + tree);
-
-        System.out.println("Path Tree: ");
-        set.printPath();
-
+        SortedSet<String> tree = new BinarySearchTreeTemplate<String>();
+        // build the tree
+        tree.add("cow");
+        tree.add("fly");
+        tree.add("dog");
+        tree.add("bat");
+        tree.add("fox");
+        tree.add("cat");
+        tree.add("eel");
+        tree.add("ant");
+        System.out.println("Original Tree: " + tree);
         tree.remove("owl");
         tree.remove("cow");
         tree.add("owl");
@@ -414,66 +404,18 @@ public class BinarySearchTreeGivenTemplate<E> extends AbstractSet<E>
         System.out.println("last element in subtree: " + subtree.last());
     }
 
-    //persistent set uses get root to get the root node.
-    BinaryTreeNode getRoot() {
-        return rootNode;
-    }
-
     // inner class that represents a node in the binary tree
     // where each node consists of the element and links to
     // left child and right child (no need for link to parent)
     protected class BinaryTreeNode {
 
-        public BinaryTreeNode leftChild, rightChild;// links to left and right subtrees
-        public E element;    //value
-        public boolean color;     // color of parent link
-        public int size;          // subtree count
-
-        public BinaryTreeNode(E element, boolean color, int size) {
-            this.element = element;
-            this.color = color;
-            this.size = size;
-        }
+        public BinaryTreeNode leftChild, rightChild;
+        public E element;
 
         public BinaryTreeNode(E element) {
             this.element = element;
             leftChild = null;
             rightChild = null;
-        }
-
-        //getting subtree count
-        public int getSize() {
-            return this.size;
-        }
-
-        //getting element
-        public E getValue() {
-            return this.element;
-        }
-
-        //getting right child
-        public BinaryTreeNode getRight() {
-            return this.rightChild;
-        }
-
-        //getting left child
-        public BinaryTreeNode getLeft() {
-            return this.leftChild;
-        }
-
-        //setting value
-        public void setValue(E value) {
-            this.element = value;
-        }
-
-        //setting right child
-        public void setRight(BinaryTreeNode node) {
-            this.rightChild = node;
-        }
-
-        //setting left child
-        public void setLeft(BinaryTreeNode node) {
-            this.leftChild = node;
         }
 
         // returns a string representation of the node and
