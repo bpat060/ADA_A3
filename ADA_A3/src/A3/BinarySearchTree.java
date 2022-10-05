@@ -97,8 +97,8 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         return inside;
     }
 
-    // adds the element to the sorted set provided it is not already in
-    // the set, and returns true if the sorted set did not already
+    // adds the element to the sorted pathSet provided it is not already in
+    // the pathSet, and returns true if the sorted pathSet did not already
     // contain the element
     public boolean add(E o) {
         if (!withinView(o)) {
@@ -158,8 +158,8 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         }
     }
 
-    // remove the element from the sorted set and returns true if the
-    // element was in the sorted set
+    // remove the element from the sorted pathSet and returns true if the
+    // element was in the sorted pathSet
     public boolean remove(Object o) {
         boolean removed = false;
         E element = (E) o; // unchecked, could throw exception
@@ -292,7 +292,7 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         return comparator;
     }
 
-    // returns the first (lowest) element currently in sorted set that
+    // returns the first (lowest) element currently in sorted pathSet that
     // is at least as big as fromElement, returns null if none found
     public E first() {
         if (rootNode == null) {
@@ -328,7 +328,7 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         return subSet(null, toElement);
     }
 
-    // returns the last (highest) element currently in sorted set that
+    // returns the last (highest) element currently in sorted pathSet that
     // is less than toElement, return null if none found
     public E last() {
         if (rootNode == null) {
@@ -377,8 +377,10 @@ public class BinarySearchTree<E> extends AbstractSet<E>
 
     public static void main(String[] args) {  // create the binary search tree
         SortedSet<String> tree = new BinarySearchTree<>();
-        PersistentDynamicSet set = new PersistentDynamicSet((BinarySearchTree) tree);
-        // adding to the tree
+        PersistentDynamicSet pathSet = new PersistentDynamicSet((BinarySearchTree) tree);
+        BalancedPersistentDynamicSet RBset = new BalancedPersistentDynamicSet<>();
+
+        // adding to the trees
         tree.add("cow");
         tree.add("fly");
         tree.add("dog");
@@ -387,27 +389,42 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         tree.add("cat");
         tree.add("eel");
         tree.add("ant");
-        set.add("cow");
-        set.add("fly");
-        set.add("dog");
-        set.add("bat");
-        set.add("fox");
-        set.add("cat");
-        set.add("eel");
-        set.add("ant");
-        System.out.println("Current Tree: " + tree);
+        pathSet.add("cow");
+        pathSet.add("fly");
+        pathSet.add("dog");
+        pathSet.add("bat");
+        pathSet.add("fox");
+        pathSet.add("cat");
+        pathSet.add("eel");
+        pathSet.add("ant");
+        RBset.add("cow");
+        RBset.add("fly");
+        RBset.add("dog");
+        RBset.add("bat");
+        RBset.add("fox");
+        RBset.add("cat");
+        RBset.add("eel");
+        RBset.add("ant");
+
+        System.out.println("Current BST: " + tree);
+        System.out.println("Red-Black Tree: " + RBset);
 
         System.out.println("Path Tree: ");
-        set.printPath();
+        pathSet.printPath();
+
         //making changes for testing
         tree.remove("eel");
-        set.remove("eel");
-        tree.add("owl");
-        set.add("owl");
+        pathSet.remove("eel");
+        RBset.remove("eel");
 
-        System.out.println("Modified Tree: " + tree);
+        tree.add("owl");
+        pathSet.add("owl");
+        RBset.add("owl");
+
+        System.out.println("Modified BST: " + tree);
+        System.out.println("Modified Red-Black Tree: " + RBset);
         System.out.println("Path Tree: ");
-        set.printPath();
+        pathSet.printPath();
 
         SortedSet<String> subtree = tree.subSet("cat", "fox");
         System.out.print("Subtree iteration: ");
@@ -423,9 +440,8 @@ public class BinarySearchTree<E> extends AbstractSet<E>
         System.out.println("last element in subtree: " + subtree.last());
     }
 
-    // inner class that represents a node in the binary tree
-    // where each node consists of the element and links to
-    // left child and right child (no need for link to parent)
+    // inner class that represents a node in the binary tree where each node consists of the element and links to
+    // left child and right child
     protected class RedBlackTree {
 
         public RedBlackTree leftChild, rightChild, parent;// links to left and right subtrees added parent for RB tree
